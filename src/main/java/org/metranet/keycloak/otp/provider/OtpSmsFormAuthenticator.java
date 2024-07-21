@@ -1,5 +1,7 @@
 package org.metranet.keycloak.otp.provider;
 
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
@@ -11,21 +13,18 @@ import org.metranet.keycloak.otp.util.OtpSmsConstant;
 import org.metranet.keycloak.otp.util.OtpSmsSender;
 import org.metranet.keycloak.otp.util.RandomStringUtil;
 
-import java.util.List;
-
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
+import java.util.Optional;
 
 /**
  * OtpSmsFormAuthenticator digunakan untuk override Login Action dan Authentication Process.
- * 
+ *
  * @see AbstractUsernameFormAuthenticator
  * @author rio.bastian
  */
 public class OtpSmsFormAuthenticator extends AbstractUsernameFormAuthenticator {
 
     Logger logger = Logger.getLogger(OtpSmsFormAuthenticator.class);
-    
+
     /**
      * Get Mobile Phone Number from Input Form
      * @param user
@@ -39,18 +38,15 @@ public class OtpSmsFormAuthenticator extends AbstractUsernameFormAuthenticator {
         }
         return number;
     }
-    
+
     /**
      * Get User By Mobile Phone Number
      * @return
      */
     private UserModel getUserByMobileNumber(AuthenticationFlowContext context, String mobilePhone) {
-        List<UserModel> listuser = context.getSession().users().searchForUserByUserAttribute(
-                                        OtpSmsConstant.ATTR_PHONE_NUMBER_ADMIN, mobilePhone, context.getRealm());
-        if(null != listuser && !listuser.isEmpty() && listuser.size() == 1) {
-            return listuser.get(0);
-        }
-        return null;
+        logger.info(mobilePhone);
+        Optional<UserModel> user = context.getSession().users().searchForUserByUserAttributeStream(context.getRealm(), OtpSmsConstant.ATTR_PHONE_NUMBER_ADMIN, mobilePhone).findFirst();
+        return user.orElse(null);
     }
     
     /**

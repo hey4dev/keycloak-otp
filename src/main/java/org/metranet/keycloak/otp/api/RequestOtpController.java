@@ -1,10 +1,9 @@
 package org.metranet.keycloak.otp.api;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 import org.metranet.keycloak.otp.util.OtpSmsConstant;
 import org.metranet.keycloak.otp.util.OtpSmsSender;
