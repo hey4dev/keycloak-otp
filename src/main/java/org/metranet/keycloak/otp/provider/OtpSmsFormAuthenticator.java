@@ -45,8 +45,7 @@ public class OtpSmsFormAuthenticator extends AbstractUsernameFormAuthenticator {
      */
     private UserModel getUserByMobileNumber(AuthenticationFlowContext context, String mobilePhone) {
         logger.info(mobilePhone);
-        Optional<UserModel> user = context.getSession().users().searchForUserByUserAttributeStream(context.getRealm(), OtpSmsConstant.ATTR_PHONE_NUMBER_ADMIN, mobilePhone).findFirst();
-        return user.orElse(null);
+        return context.getSession().users().getUserByUsername(context.getRealm(), mobilePhone);
     }
     
     /**
@@ -64,7 +63,7 @@ public class OtpSmsFormAuthenticator extends AbstractUsernameFormAuthenticator {
      */
     private void sendOtp(AuthenticationFlowContext context) {
         String mobile  = getMobileNumber(context);
-        UserModel user = getUserByMobileNumber(context, mobile); 
+        UserModel user = getUserByMobileNumber(context, mobile);
         if(null == user) {
             goErrorPage(context, "Oops, Member not found.");
             return;

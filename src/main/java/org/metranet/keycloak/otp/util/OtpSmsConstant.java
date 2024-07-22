@@ -5,8 +5,8 @@ package org.metranet.keycloak.otp.util;
  */
 public class OtpSmsConstant {
 
-    public static final String HTTP_AUTH_HOST              = "http://localhost:8095";
-    public static final String ATTR_PHONE_NUMBER_ADMIN     = "username";
+    public static final String HTTP_AUTH_HOST              = "http://172.29.82.12:8080";
+    public static final String ATTR_PHONE_NUMBER_ADMIN     = "mobile_number";
     public static final String ATTR_PHONE_NUMBER           = "user.attributes." + ATTR_PHONE_NUMBER_ADMIN;
     public static final String ATTR_OTP_CODE               = "user.attributes.otp";
     public static final String ATTR_OTP_USER               = "sms_otp_user";
