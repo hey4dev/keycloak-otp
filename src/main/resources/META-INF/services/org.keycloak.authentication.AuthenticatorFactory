@@ -1,1 +1,3 @@
 org.metranet.keycloak.otp.factory.OtpSmsFormAuthenticatorFactory
+org.metranet.keycloak.otp.factory.OtpSmsGrantAuthenticatorFactory
+org.metranet.keycloak.otp.condition.OtpConditionFactory

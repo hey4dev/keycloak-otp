@@ -15,6 +15,8 @@ import org.metranet.keycloak.otp.util.RandomStringUtil;
 
 import java.util.Optional;
 
+import static org.metranet.keycloak.otp.util.OtpSmsConstant.getUserByMobileNumber;
+
 /**
  * OtpSmsFormAuthenticator digunakan untuk override Login Action dan Authentication Process.
  *
@@ -43,10 +45,7 @@ public class OtpSmsFormAuthenticator extends AbstractUsernameFormAuthenticator {
      * Get User By Mobile Phone Number
      * @return
      */
-    private UserModel getUserByMobileNumber(AuthenticationFlowContext context, String mobilePhone) {
-        logger.info(mobilePhone);
-        return context.getSession().users().getUserByUsername(context.getRealm(), mobilePhone);
-    }
+
     
     /**
      * Generate 6 Random Digit

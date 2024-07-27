@@ -4,6 +4,7 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;
@@ -18,15 +19,14 @@ import org.keycloak.models.utils.FormMessage;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.metranet.keycloak.otp.util.OtpSmsConstant;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OtpSmsFormRegistration implements FormAction, FormActionFactory {
+import static org.metranet.keycloak.otp.util.OtpSmsConstant.getContent;
 
-    Logger logger = Logger.getLogger(OtpSmsFormRegistration.class);
+
+public class OtpSmsFormRegistration implements FormAction, FormActionFactory {
+    public static Logger logger = Logger.getLogger(OtpSmsFormRegistration.class);
     
     public static final String ID = "otp-sms-form-registration";
 
@@ -121,21 +121,11 @@ public class OtpSmsFormRegistration implements FormAction, FormActionFactory {
         }
         return otpcode;
     }
-    
-    private String getContent(InputStream is) throws IOException {
-        ByteArrayOutputStream result = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = is.read(buffer)) != -1) {
-            result.write(buffer, 0, length);
-        }
-        return result.toString("UTF-8");
-    }
-    
-    private String validity(ValidationContext context, String mobileNumber, String code){
-        HttpClient httpClient = context.getSession().getProvider(HttpClientProvider.class).getHttpClient();
-        HttpGet get = new HttpGet(OtpSmsConstant.HTTP_AUTH_HOST + "/auth/realms/akuid/otpsms/ck/" + mobileNumber + "/" + code);
 
+    
+    public static String validity(KeycloakSession session, String mobileNumber, String code){
+        HttpClient httpClient = session.getProvider(HttpClientProvider.class).getHttpClient();
+        HttpGet get = new HttpGet(OtpSmsConstant.HTTP_AUTH_HOST + "/realms/smartis/otpsms/ck/" + mobileNumber + "/" + code);
         try {
             HttpResponse response = httpClient.execute(get);
             return getContent(response.getEntity().getContent());
@@ -149,7 +139,7 @@ public class OtpSmsFormRegistration implements FormAction, FormActionFactory {
     public void validate(ValidationContext context) {
         String mobileNumber = getMobileNumber(context);
         String codeOtp      = getCodeOtp(context);
-        if("true".equals(validity(context, mobileNumber, codeOtp))) {
+        if("true".equals(validity(context.getSession(), mobileNumber, codeOtp))) {
             context.success();
             return;
         }

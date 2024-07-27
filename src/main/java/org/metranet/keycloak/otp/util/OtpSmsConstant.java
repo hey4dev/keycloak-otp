@@ -1,5 +1,12 @@
 package org.metranet.keycloak.otp.util;
 
+import org.keycloak.authentication.AuthenticationFlowContext;
+import org.keycloak.models.UserModel;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  * @author rio.bastian
  */
@@ -19,4 +26,19 @@ public class OtpSmsConstant {
     public static final String PAGE_INPUT_PHONE_NUMBER     = "sms-input-phone-number.ftl";
     public static final String PAGE_INPUT_OTP              = "sms-input-otp.ftl";
     public static final String PAGE_ERROR                  = "sms-error.ftl";
+
+
+    public static String getContent(InputStream is) throws IOException {
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = is.read(buffer)) != -1) {
+            result.write(buffer, 0, length);
+        }
+        return result.toString("UTF-8");
+    }
+
+    public static UserModel getUserByMobileNumber(AuthenticationFlowContext context, String mobilePhone) {
+        return context.getSession().users().getUserByUsername(context.getRealm(), mobilePhone);
+    }
 }
