@@ -1,7 +1,8 @@
-package org.metranet.keycloak.otp.provider;
+package com.shahrtech.keycloak.otp.provider;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shahrtech.keycloak.otp.kafka.MessageKafkaDto;
 import jakarta.mail.AuthenticationFailedException;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.core.MediaType;
@@ -15,28 +16,19 @@ import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
-import org.keycloak.authentication.authenticators.browser.AbstractUsernameFormAuthenticator;
 import org.keycloak.connections.httpclient.HttpClientProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
-import org.metranet.keycloak.otp.kafka.MessageKafkaDto;
-import org.metranet.keycloak.otp.util.KafkaType;
-import org.metranet.keycloak.otp.util.OtpSmsConstant;
-import org.metranet.keycloak.otp.util.PhoneUtil;
+import com.shahrtech.keycloak.otp.util.KafkaType;
+import com.shahrtech.keycloak.otp.util.OtpSmsConstant;
+import com.shahrtech.keycloak.otp.util.PhoneUtil;
 
 import java.io.IOException;
 
-import static org.metranet.keycloak.otp.provider.OtpSmsFormRegistration.validity;
-import static org.metranet.keycloak.otp.util.OtpSmsConstant.getContent;
-import static org.metranet.keycloak.otp.util.OtpSmsConstant.getUserByMobileNumber;
+import static com.shahrtech.keycloak.otp.util.OtpSmsConstant.getContent;
+import static com.shahrtech.keycloak.otp.util.OtpSmsConstant.getUserByMobileNumber;
 
-/**
- * OtpSmsFormAuthenticator digunakan untuk override Login Action dan Authentication Process.
- *
- * @author rio.bastian
- * @see AbstractUsernameFormAuthenticator
- */
 public class OtpSmsGrantAuthenticator implements Authenticator {
     private final Logger logger = Logger.getLogger(OtpSmsGrantAuthenticator.class);
 
@@ -57,7 +49,7 @@ public class OtpSmsGrantAuthenticator implements Authenticator {
             logger.info(username);
             if (sessionKey != null) {
                 // Get OTP from User Input
-                String otp = validity(context.getSession(), context.getRealm().getName(), username, sessionKey);
+                String otp = OtpSmsFormRegistration.validity(context.getSession(), context.getRealm().getName(), username, sessionKey);
                 logger.info("otp is: " + otp);
                 // Validate OTP
                 if (otp != null) {

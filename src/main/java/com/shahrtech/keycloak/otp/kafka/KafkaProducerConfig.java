@@ -1,4 +1,4 @@
-package org.metranet.keycloak.otp.kafka;
+package com.shahrtech.keycloak.otp.kafka;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,9 +6,6 @@ import java.util.Map;
 import org.keycloak.Config.Scope;
 
 public class KafkaProducerConfig {
-
-	// https://kafka.apache.org/documentation/#producerconfigs
-
 	public static Map<String, Object> init(Scope scope) {
 		Map<String, Object> propertyMap = new HashMap<>();
 		KafkaProducerProperty[] producerProperties = KafkaProducerProperty.values();

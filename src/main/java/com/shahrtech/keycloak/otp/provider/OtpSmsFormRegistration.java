@@ -1,10 +1,9 @@
-package org.metranet.keycloak.otp.provider;
+package com.shahrtech.keycloak.otp.provider;
 
 import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;
@@ -17,12 +16,12 @@ import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.*;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.provider.ProviderConfigProperty;
-import org.metranet.keycloak.otp.util.OtpSmsConstant;
+import com.shahrtech.keycloak.otp.util.OtpSmsConstant;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.metranet.keycloak.otp.util.OtpSmsConstant.getContent;
+import static com.shahrtech.keycloak.otp.util.OtpSmsConstant.getContent;
 
 
 public class OtpSmsFormRegistration implements FormAction, FormActionFactory {

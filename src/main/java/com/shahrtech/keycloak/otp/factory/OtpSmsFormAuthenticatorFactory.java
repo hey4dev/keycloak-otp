@@ -1,4 +1,4 @@
-package org.metranet.keycloak.otp.factory;
+package com.shahrtech.keycloak.otp.factory;
 
 import org.keycloak.Config;
 import org.keycloak.authentication.Authenticator;
@@ -7,18 +7,10 @@ import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.provider.ProviderConfigProperty;
-import org.metranet.keycloak.otp.provider.OtpSmsFormAuthenticator;
+import com.shahrtech.keycloak.otp.provider.OtpSmsFormAuthenticator;
 
 import java.util.List;
 
-/**
- * OtpSmsFormAuthenticatorFactory digunakan sebagai model Authenticator.
- * outputnya adalah sebuah Provider baru yang bisa didaftarkan menjadi Execution FLow 
- * di dalam proses Keycloak Authentication.
- * 
- * @see AuthenticatorFactory
- * @author rio.bastian
- */
 public class OtpSmsFormAuthenticatorFactory implements AuthenticatorFactory {
 
     public static final String ID = "otp-sms-form";

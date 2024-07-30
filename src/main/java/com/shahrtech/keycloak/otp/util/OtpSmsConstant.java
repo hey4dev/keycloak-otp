@@ -1,4 +1,4 @@
-package org.metranet.keycloak.otp.util;
+package com.shahrtech.keycloak.otp.util;
 
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.models.UserModel;
@@ -7,9 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * @author rio.bastian
- */
 public class OtpSmsConstant {
 
     public static final String HTTP_AUTH_HOST              = "http://172.29.85.24:8080";

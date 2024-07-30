@@ -1,4 +1,4 @@
-package org.metranet.keycloak.otp.util;
+package com.shahrtech.keycloak.otp.util;
 
 public class PhoneUtil {
     public static String correctPartOfCelPhone(String cellPhone) {

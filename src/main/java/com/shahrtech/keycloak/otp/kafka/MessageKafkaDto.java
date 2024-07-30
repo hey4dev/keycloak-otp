@@ -1,7 +1,7 @@
-package org.metranet.keycloak.otp.kafka;
+package com.shahrtech.keycloak.otp.kafka;
 
 import lombok.Builder;
-import org.metranet.keycloak.otp.util.KafkaType;
+import com.shahrtech.keycloak.otp.util.KafkaType;
 
 import java.util.UUID;
 

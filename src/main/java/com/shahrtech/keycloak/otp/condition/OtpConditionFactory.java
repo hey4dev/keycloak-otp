@@ -1,4 +1,4 @@
-package org.metranet.keycloak.otp.condition;
+package com.shahrtech.keycloak.otp.condition;
 
 import org.keycloak.Config;
 import org.keycloak.authentication.authenticators.conditional.ConditionalAuthenticator;

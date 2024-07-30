@@ -1,1 +1,1 @@
-org.metranet.keycloak.otp.factory.RequestOtpProviderFactory
+com.shahrtech.keycloak.otp.factory.RequestOtpProviderFactory

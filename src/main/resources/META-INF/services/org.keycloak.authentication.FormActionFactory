@@ -1,1 +1,1 @@
-org.metranet.keycloak.otp.provider.OtpSmsFormRegistration
+com.shahrtech.keycloak.otp.provider.OtpSmsFormRegistration

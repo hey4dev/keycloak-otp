@@ -1,4 +1,4 @@
-package org.metranet.keycloak.otp.provider;
+package com.shahrtech.keycloak.otp.provider;
 
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
@@ -9,18 +9,12 @@ import org.keycloak.authentication.authenticators.browser.AbstractUsernameFormAu
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
-import org.metranet.keycloak.otp.util.OtpSmsConstant;
-import org.metranet.keycloak.otp.util.OtpSmsSender;
-import org.metranet.keycloak.otp.util.RandomStringUtil;
+import com.shahrtech.keycloak.otp.util.OtpSmsConstant;
+import com.shahrtech.keycloak.otp.util.OtpSmsSender;
+import com.shahrtech.keycloak.otp.util.RandomStringUtil;
 
-import static org.metranet.keycloak.otp.util.OtpSmsConstant.getUserByMobileNumber;
+import static com.shahrtech.keycloak.otp.util.OtpSmsConstant.getUserByMobileNumber;
 
-/**
- * OtpSmsFormAuthenticator digunakan untuk override Login Action dan Authentication Process.
- *
- * @author rio.bastian
- * @see AbstractUsernameFormAuthenticator
- */
 public class OtpSmsFormAuthenticator extends AbstractUsernameFormAuthenticator {
 
     Logger logger = Logger.getLogger(OtpSmsFormAuthenticator.class);

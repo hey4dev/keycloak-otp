@@ -1,7 +1,9 @@
-package org.metranet.keycloak.otp.util;
+package com.shahrtech.keycloak.otp.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shahrtech.keycloak.otp.kafka.MessageKafkaDto;
+import com.shahrtech.keycloak.otp.provider.KafkaProvider;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -10,12 +12,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.jboss.logging.Logger;
 import org.keycloak.models.KeycloakSession;
-import org.metranet.keycloak.otp.kafka.MessageKafkaDto;
-import org.metranet.keycloak.otp.provider.KafkaProvider;
 
 import java.io.IOException;
-
-import static org.metranet.keycloak.otp.util.OtpSmsConstant.getContent;
 
 public class OtpSmsSender {
     static Logger logger = Logger.getLogger(OtpSmsSender.class);
@@ -73,7 +71,7 @@ public class OtpSmsSender {
         HttpEntity entity = response.getEntity();
         if (entity != null) {
             ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(getContent(entity.getContent()));
+            JsonNode jsonNode = objectMapper.readTree(OtpSmsConstant.getContent(entity.getContent()));
             String access_token = jsonNode.get("access_token").toString();
             if (access_token != null)
                 return access_token.replace("\"", "").trim();

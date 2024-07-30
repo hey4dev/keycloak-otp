@@ -1,9 +1,9 @@
-package org.metranet.keycloak.otp.provider;
+package com.shahrtech.keycloak.otp.provider;
 
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.services.resource.RealmResourceProvider;
-import org.metranet.keycloak.otp.api.RequestOtpController;
-import org.metranet.keycloak.otp.kafka.KafkaProducerFactory;
+import com.shahrtech.keycloak.otp.api.RequestOtpController;
+import com.shahrtech.keycloak.otp.kafka.KafkaProducerFactory;
 
 import java.util.Map;
 

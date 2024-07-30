@@ -1,15 +1,14 @@
-package org.metranet.keycloak.otp.factory;
+package com.shahrtech.keycloak.otp.factory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jboss.logging.Logger;
 import org.keycloak.Config.Scope;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.services.resource.RealmResourceProviderFactory;
-import org.metranet.keycloak.otp.kafka.KafkaProducerConfig;
-import org.metranet.keycloak.otp.kafka.KafkaStandardProducerFactory;
-import org.metranet.keycloak.otp.provider.RequestOtpProvider;
+import com.shahrtech.keycloak.otp.kafka.KafkaProducerConfig;
+import com.shahrtech.keycloak.otp.kafka.KafkaStandardProducerFactory;
+import com.shahrtech.keycloak.otp.provider.RequestOtpProvider;
 
 import java.util.Map;
 

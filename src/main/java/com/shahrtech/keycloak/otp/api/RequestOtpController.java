@@ -1,12 +1,12 @@
-package org.metranet.keycloak.otp.api;
+package com.shahrtech.keycloak.otp.api;
 
+import com.shahrtech.keycloak.otp.util.*;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 import org.keycloak.models.KeycloakSession;
-import org.metranet.keycloak.otp.util.*;
 
 public class RequestOtpController {
     Logger logger = Logger.getLogger(RequestOtpController.class);

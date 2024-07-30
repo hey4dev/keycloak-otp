@@ -1,4 +1,4 @@
-package org.metranet.keycloak.otp.factory;
+package com.shahrtech.keycloak.otp.factory;
 
 import org.keycloak.Config;
 import org.keycloak.authentication.Authenticator;
@@ -7,7 +7,7 @@ import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.provider.ProviderConfigProperty;
-import org.metranet.keycloak.otp.provider.OtpSmsGrantAuthenticator;
+import com.shahrtech.keycloak.otp.provider.OtpSmsGrantAuthenticator;
 
 import java.util.List;
 

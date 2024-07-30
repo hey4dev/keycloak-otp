@@ -1,4 +1,4 @@
-package org.metranet.keycloak.otp.util;
+package com.shahrtech.keycloak.otp.util;
 
 import org.apache.commons.collections4.map.PassiveExpiringMap;
 

@@ -1,4 +1,4 @@
-package org.metranet.keycloak.otp.condition;
+package com.shahrtech.keycloak.otp.condition;
 
 import jakarta.ws.rs.core.MultivaluedMap;
 import org.jboss.logging.Logger;

@@ -1,4 +1,4 @@
-package org.metranet.keycloak.otp.provider;
+package com.shahrtech.keycloak.otp.provider;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,8 +6,8 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.jboss.logging.Logger;
-import org.metranet.keycloak.otp.kafka.KafkaProducerFactory;
-import org.metranet.keycloak.otp.kafka.MessageKafkaDto;
+import com.shahrtech.keycloak.otp.kafka.KafkaProducerFactory;
+import com.shahrtech.keycloak.otp.kafka.MessageKafkaDto;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
