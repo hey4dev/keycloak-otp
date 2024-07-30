@@ -31,7 +31,7 @@ public class OtpSmsFormAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public Authenticator create(KeycloakSession session) {
-        return new OtpSmsFormAuthenticator();
+        return new OtpSmsFormAuthenticator(session);
     }
 
     @Override

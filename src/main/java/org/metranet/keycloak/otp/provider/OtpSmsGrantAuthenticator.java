@@ -1,7 +1,5 @@
 package org.metranet.keycloak.otp.provider;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.json.UTF8StreamJsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.AuthenticationFailedException;
@@ -22,12 +20,12 @@ import org.keycloak.connections.httpclient.HttpClientProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.metranet.keycloak.otp.kafka.MessageKafkaDto;
+import org.metranet.keycloak.otp.util.KafkaType;
 import org.metranet.keycloak.otp.util.OtpSmsConstant;
+import org.metranet.keycloak.otp.util.PhoneUtil;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 import static org.metranet.keycloak.otp.provider.OtpSmsFormRegistration.validity;
 import static org.metranet.keycloak.otp.util.OtpSmsConstant.getContent;
@@ -50,13 +48,16 @@ public class OtpSmsGrantAuthenticator implements Authenticator {
     @Override
     public void authenticate(AuthenticationFlowContext context) {
         try {
+            String ipAddress = context.getConnection().getRemoteAddr();
+            String client = context.getHttpRequest().getDecodedFormParameters().getFirst("client_id");
             String sessionKey = context.getHttpRequest().getDecodedFormParameters().getFirst("otp-code");
             logger.info(sessionKey);
             String username = context.getHttpRequest().getDecodedFormParameters().getFirst("username");
+            username = PhoneUtil.refineCellPhoneNumber(username);
             logger.info(username);
             if (sessionKey != null) {
                 // Get OTP from User Input
-                String otp = validity(context.getSession(), username, sessionKey);
+                String otp = validity(context.getSession(), context.getRealm().getName(), username, sessionKey);
                 logger.info("otp is: " + otp);
                 // Validate OTP
                 if (otp != null) {
@@ -64,9 +65,28 @@ public class OtpSmsGrantAuthenticator implements Authenticator {
                         UserModel user = getUserByMobileNumber(context, username);
                         if (user == null) {
                             logger.info("user with username: " + username + " creating...");
-                            createUser(context.getSession(), context.getRealm().getName(), username);
+                            createUser(context.getSession(), context.getRealm().getName(), username, client);
+                            KafkaProvider.getInstance().produce(
+                                    MessageKafkaDto.builder()
+                                            .client(client)
+                                            .realm(context.getRealm().getName())
+                                            .type(KafkaType.NEW_USER)
+                                            .username(username)
+                                            .ipAddress(ipAddress)
+                                            .build()
+                            );
                             logger.info("user with username: " + username + " created.");
                         }
+
+                        KafkaProvider.getInstance().produce(
+                                MessageKafkaDto.builder()
+                                        .client(client)
+                                        .realm(context.getRealm().getName())
+                                        .type(KafkaType.LOGIN)
+                                        .username(username)
+                                        .ipAddress(ipAddress)
+                                        .build()
+                        );
                         context.success();
                     } else {
                         throw new AuthenticationFailedException("OTP fail");
@@ -88,7 +108,7 @@ public class OtpSmsGrantAuthenticator implements Authenticator {
         }
     }
 
-    public String getToken(KeycloakSession session, String realm) throws IOException {
+    public String getToken(KeycloakSession session, String realm, String clientId) throws IOException {
         HttpClient httpClient = session.getProvider(HttpClientProvider.class).getHttpClient();
         HttpPost httpPost = new HttpPost(OtpSmsConstant.HTTP_AUTH_HOST + "/realms/" + realm + "/protocol/openid-connect/token");
 
@@ -97,7 +117,7 @@ public class OtpSmsGrantAuthenticator implements Authenticator {
 
         // Build form parameters
         StringBuilder params = new StringBuilder();
-        params.append("client_id=").append("test").append("&");
+        params.append("client_id=").append(clientId).append("&");
         params.append("username=").append("server").append("&");
         params.append("password=").append("server").append("&");
         params.append("grant_type=password");
@@ -109,7 +129,6 @@ public class OtpSmsGrantAuthenticator implements Authenticator {
         if (entity != null) {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(getContent(entity.getContent()));
-            logger.info(jsonNode);
             String access_token = jsonNode.get("access_token").toString();
             if (access_token != null)
                 return access_token.replace("\"", "").trim();
@@ -118,9 +137,8 @@ public class OtpSmsGrantAuthenticator implements Authenticator {
         return null;
     }
 
-    private void createUser(KeycloakSession session, String realm, String username) throws IOException {
-        String token = getToken(session, realm);
-        logger.info(token);
+    private void createUser(KeycloakSession session, String realm, String username, String clientId) throws IOException {
+        String token = getToken(session, realm, clientId);
 
         if (token == null)
             throw new InternalServerErrorException("token is null");
@@ -133,16 +151,12 @@ public class OtpSmsGrantAuthenticator implements Authenticator {
         httpPost.setHeader("Content-Type", "application/json");
         httpPost.setHeader("Authorization", "Bearer " + token.trim());
 
-        logger.info("Bearer " + token.trim());
-
         // Build form parameters
         String params = "{\"username\":\"" + username + "\",\"enabled\":true,\"emailVerified\":true,\"access\":{\"manageGroupMembership\":true,\"view\":true,\"mapRoles\":true,\"impersonate\":true,\"manage\":true}}";
 
         // Set entity
         httpPost.setEntity(new StringEntity(params));
-        HttpResponse response = httpClient.execute(httpPost);
-        HttpEntity entity = response.getEntity();
-        logger.info(getContent(entity.getContent()));
+        httpClient.execute(httpPost);
     }
 
     @Override

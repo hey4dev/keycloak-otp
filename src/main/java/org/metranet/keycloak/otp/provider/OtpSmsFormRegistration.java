@@ -27,17 +27,17 @@ import static org.metranet.keycloak.otp.util.OtpSmsConstant.getContent;
 
 public class OtpSmsFormRegistration implements FormAction, FormActionFactory {
     public static Logger logger = Logger.getLogger(OtpSmsFormRegistration.class);
-    
+
     public static final String ID = "otp-sms-form-registration";
 
     private static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
-        AuthenticationExecutionModel.Requirement.REQUIRED,
-        AuthenticationExecutionModel.Requirement.CONDITIONAL,
-        AuthenticationExecutionModel.Requirement.DISABLED
+            AuthenticationExecutionModel.Requirement.REQUIRED,
+            AuthenticationExecutionModel.Requirement.CONDITIONAL,
+            AuthenticationExecutionModel.Requirement.DISABLED
     };
-    
+
     KeycloakSession session;
-    
+
     @Override
     public FormAction create(KeycloakSession session) {
         this.session = session;
@@ -68,22 +68,22 @@ public class OtpSmsFormRegistration implements FormAction, FormActionFactory {
     public String getHelpText() {
         return "OTP Using SMS Registration";
     }
-    
+
     @Override
     public boolean isConfigurable() {
         return false;
     }
-    
+
     @Override
     public boolean isUserSetupAllowed() {
         return true;
     }
-    
+
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
         return null;
     }
-    
+
     @Override
     public void postInit(KeycloakSessionFactory factory) {
         // do nothing
@@ -93,7 +93,7 @@ public class OtpSmsFormRegistration implements FormAction, FormActionFactory {
     public void init(Config.Scope config) {
         // do nothing
     }
-    
+
     @Override
     public void close() {
         // do nothing
@@ -103,29 +103,29 @@ public class OtpSmsFormRegistration implements FormAction, FormActionFactory {
     public void buildPage(FormContext context, LoginFormsProvider form) {
         // do nothing
     }
-    
-    private String getMobileNumber(ValidationContext context){
+
+    private String getMobileNumber(ValidationContext context) {
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         String number = formData.getFirst(OtpSmsConstant.ATTR_PHONE_NUMBER);
-        if(null == number) {
+        if (null == number) {
             return "";
         }
         return number;
     }
-    
-    private String getCodeOtp(ValidationContext context){
+
+    private String getCodeOtp(ValidationContext context) {
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         String otpcode = formData.getFirst(OtpSmsConstant.ATTR_OTP_CODE);
-        if(null == otpcode) {
+        if (null == otpcode) {
             return "";
         }
         return otpcode;
     }
 
-    
-    public static String validity(KeycloakSession session, String mobileNumber, String code){
+
+    public static String validity(KeycloakSession session, String realm, String mobileNumber, String code) {
         HttpClient httpClient = session.getProvider(HttpClientProvider.class).getHttpClient();
-        HttpGet get = new HttpGet(OtpSmsConstant.HTTP_AUTH_HOST + "/realms/smartis/otpsms/ck/" + mobileNumber + "/" + code);
+        HttpGet get = new HttpGet(OtpSmsConstant.HTTP_AUTH_HOST + "/realms/" + realm + "/otpsms/ck/" + mobileNumber + "/" + code);
         try {
             HttpResponse response = httpClient.execute(get);
             return getContent(response.getEntity().getContent());
@@ -134,19 +134,19 @@ public class OtpSmsFormRegistration implements FormAction, FormActionFactory {
         }
         return "";
     }
-    
+
     @Override
     public void validate(ValidationContext context) {
         String mobileNumber = getMobileNumber(context);
-        String codeOtp      = getCodeOtp(context);
-        if("true".equals(validity(context.getSession(), mobileNumber, codeOtp))) {
+        String codeOtp = getCodeOtp(context);
+        if ("true".equals(validity(context.getSession(), context.getRealm().getName(), mobileNumber, codeOtp))) {
             context.success();
             return;
         }
-        
+
         List<FormMessage> errors = new ArrayList<>();
         errors.add(new FormMessage("user.attributes.otp", "OTP Code is invalid</br>"));
-        
+
         context.error(Errors.INVALID_REGISTRATION);
         context.validationError(context.getHttpRequest().getDecodedFormParameters(), errors);
         return;

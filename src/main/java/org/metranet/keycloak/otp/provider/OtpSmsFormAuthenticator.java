@@ -13,29 +13,33 @@ import org.metranet.keycloak.otp.util.OtpSmsConstant;
 import org.metranet.keycloak.otp.util.OtpSmsSender;
 import org.metranet.keycloak.otp.util.RandomStringUtil;
 
-import java.util.Optional;
-
 import static org.metranet.keycloak.otp.util.OtpSmsConstant.getUserByMobileNumber;
 
 /**
  * OtpSmsFormAuthenticator digunakan untuk override Login Action dan Authentication Process.
  *
- * @see AbstractUsernameFormAuthenticator
  * @author rio.bastian
+ * @see AbstractUsernameFormAuthenticator
  */
 public class OtpSmsFormAuthenticator extends AbstractUsernameFormAuthenticator {
 
     Logger logger = Logger.getLogger(OtpSmsFormAuthenticator.class);
+    private final KeycloakSession session;
+
+    public OtpSmsFormAuthenticator(KeycloakSession session) {
+        this.session = session;
+    }
 
     /**
      * Get Mobile Phone Number from Input Form
+     *
      * @param user
      * @return
      */
-    private String getMobileNumber(AuthenticationFlowContext context){
+    private String getMobileNumber(AuthenticationFlowContext context) {
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         String number = formData.getFirst(OtpSmsConstant.ATTR_PHONE_NUMBER);
-        if(null == number) {
+        if (null == number) {
             return "";
         }
         return number;
@@ -46,56 +50,60 @@ public class OtpSmsFormAuthenticator extends AbstractUsernameFormAuthenticator {
      * @return
      */
 
-    
+
     /**
      * Generate 6 Random Digit
+     *
      * @return
      */
     private String getRandomDigit() {
         RandomStringUtil random = new RandomStringUtil(6, RandomStringUtil.NUMERIC);
         return random.nextString();
     }
-    
+
     /**
      * Prepare OTP to be sent
+     *
      * @param context
      */
     private void sendOtp(AuthenticationFlowContext context) {
-        String mobile  = getMobileNumber(context);
+        String mobile = getMobileNumber(context);
         UserModel user = getUserByMobileNumber(context, mobile);
-        if(null == user) {
+        if (null == user) {
             goErrorPage(context, "Oops, Member not found.");
             return;
         }
-        
+
         // Generate Random Digit
         String key = getRandomDigit();
-        
+
         // Put the data into session, to be compared
         context.getAuthenticationSession().setAuthNote(OtpSmsConstant.SESSION_OTP_CODE, key);
 
-        // Send the key into the User Mobile Phone
-        if(OtpSmsSender.sendSMS(mobile, key) == 0) {
+        try {
+            // Send the key into the User Mobile Phone
+            OtpSmsSender.sendSMS(session, mobile, key);
             context.setUser(user);
             goPage(context, OtpSmsConstant.PAGE_INPUT_OTP);
-            return;
-        } else {
+        } catch (Exception e) {
+            logger.error(e.getMessage());
             goErrorPage(context, "Failed to send OTP Code.");
-            return;
         }
     }
-    
+
     /**
      * Generate Page
+     *
      * @param context
      * @param page
      */
     private void goPage(AuthenticationFlowContext context, String page) {
         context.challenge(context.form().createForm(page));
     }
-    
+
     /**
      * Generate Error Page
+     *
      * @param context
      * @param message
      */
@@ -105,9 +113,10 @@ public class OtpSmsFormAuthenticator extends AbstractUsernameFormAuthenticator {
                 .createForm(OtpSmsConstant.PAGE_ERROR);
         context.failureChallenge(AuthenticationFlowError.INTERNAL_ERROR, challenge);
     }
-    
+
     /**
      * Get Attribute Value from a HTML Form
+     *
      * @param context
      * @param key
      * @return
@@ -115,22 +124,22 @@ public class OtpSmsFormAuthenticator extends AbstractUsernameFormAuthenticator {
     private String getValue(AuthenticationFlowContext context, String key) {
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         String value = formData.getFirst(key);
-        if(null == value) {
+        if (null == value) {
             value = "";
         }
         return value;
     }
-    
+
     @Override
     public void action(AuthenticationFlowContext context) {
-        switch(getValue(context, OtpSmsConstant.FLAG_PAGE)) {
-            case OtpSmsConstant.FLAG_OTP_PAGE :
+        switch (getValue(context, OtpSmsConstant.FLAG_PAGE)) {
+            case OtpSmsConstant.FLAG_OTP_PAGE:
                 authenticate(context);
                 break;
-            case OtpSmsConstant.FLAG_LOGIN_PAGE :
+            case OtpSmsConstant.FLAG_LOGIN_PAGE:
                 sendOtp(context);
                 break;
-            default :
+            default:
                 goPage(context, OtpSmsConstant.PAGE_INPUT_PHONE_NUMBER);
                 break;
         }

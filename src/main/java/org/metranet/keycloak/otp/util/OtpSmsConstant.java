@@ -12,7 +12,7 @@ import java.io.InputStream;
  */
 public class OtpSmsConstant {
 
-    public static final String HTTP_AUTH_HOST              = "http://172.29.82.12:8080";
+    public static final String HTTP_AUTH_HOST              = "http://172.29.85.24:8080";
     public static final String ATTR_PHONE_NUMBER_ADMIN     = "mobile_number";
     public static final String ATTR_PHONE_NUMBER           = "user.attributes." + ATTR_PHONE_NUMBER_ADMIN;
     public static final String ATTR_OTP_CODE               = "user.attributes.otp";
@@ -23,7 +23,7 @@ public class OtpSmsConstant {
 
     public static final String SESSION_OTP_CODE            = "otp-code";
 
-    public static final String PAGE_INPUT_PHONE_NUMBER     = "sms-input-phone-number.ftl";
+    public static final String PAGE_INPUT_PHONE_NUMBER     = "sms-input-username-number.ftl";
     public static final String PAGE_INPUT_OTP              = "sms-input-otp.ftl";
     public static final String PAGE_ERROR                  = "sms-error.ftl";
 
