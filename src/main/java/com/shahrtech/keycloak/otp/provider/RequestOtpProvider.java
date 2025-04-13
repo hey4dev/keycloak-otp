@@ -15,7 +15,7 @@ public class RequestOtpProvider implements RealmResourceProvider {
                               String topicEvents,
                               Map<String, Object> kafkaProducerProperties,
                               KafkaProducerFactory factory) {
-        KafkaProvider.setInstance(bootstrapServers, clientId, topicEvents, kafkaProducerProperties, factory);
+        KafkaProvider.setInstance(session.getContext().getRealm().getName(), bootstrapServers, clientId, topicEvents, kafkaProducerProperties, factory);
         this.session = session;
     }
 

@@ -58,7 +58,7 @@ public class OtpSmsGrantAuthenticator implements Authenticator {
                         if (user == null) {
                             logger.info("user with username: " + username + " creating...");
                             createUser(context.getSession(), context.getRealm().getName(), username, client);
-                            KafkaProvider.getInstance().produce(
+                            KafkaProvider.getInstance(context.getRealm().getName()).produce(
                                     MessageKafkaDto.builder()
                                             .client(client)
                                             .realm(context.getRealm().getName())
@@ -70,7 +70,7 @@ public class OtpSmsGrantAuthenticator implements Authenticator {
                             logger.info("user with username: " + username + " created.");
                         }
 
-                        KafkaProvider.getInstance().produce(
+                        KafkaProvider.getInstance(context.getRealm().getName()).produce(
                                 MessageKafkaDto.builder()
                                         .client(client)
                                         .realm(context.getRealm().getName())

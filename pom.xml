@@ -4,7 +4,7 @@
     <name>Keycloak OTP SMS</name>
     <groupId>com.metranet.keycloak</groupId>
     <artifactId>otp-sms</artifactId>
-    <version>3.4.0</version>
+    <version>3.5.0</version>
 
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>

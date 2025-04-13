@@ -10,14 +10,11 @@ import com.shahrtech.keycloak.otp.kafka.KafkaProducerFactory;
 import com.shahrtech.keycloak.otp.kafka.MessageKafkaDto;
 
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 public class KafkaProvider {
     private static final Logger logger = Logger.getLogger(KafkaProvider.class);
-    private static volatile KafkaProvider instance;
+    private static final ConcurrentHashMap<String, KafkaProvider> instance = new ConcurrentHashMap<>();
     private final String topicEvents;
     private final Producer<String, String> producer;
     private final ObjectMapper mapper;
@@ -32,30 +29,28 @@ public class KafkaProvider {
         producer = factory.createProducer(clientId, bootstrapServers, kafkaProducerProperties);
     }
 
-    public static KafkaProvider getInstance() {
-        return instance;
+    public static KafkaProvider getInstance(String realm) {
+        logger.info(instance.toString());
+        return instance.get(realm);
     }
 
-    public static void setInstance(String bootstrapServers,
+    public static void setInstance(String realm,
+                                   String bootstrapServers,
                                    String clientId,
                                    String topicEvents,
                                    Map<String, Object> kafkaProducerProperties,
                                    KafkaProducerFactory factory) {
         logger.info("Kafka provider set instance");
-        KafkaProvider result = instance;
-        if (result == null) {
-            synchronized (KafkaProvider.class) {
-                result = instance;
-                if (result == null) {
-                    instance = new KafkaProvider(bootstrapServers,
-                            clientId,
-                            topicEvents,
-                            kafkaProducerProperties,
-                            factory);
-                    logger.info("Kafka provider set instance new instance");
-                }
-            }
-        }
+        instance.computeIfAbsent(realm, r -> {
+            logger.info("Kafka provider set instance new instance");
+            return new KafkaProvider(
+                    bootstrapServers,
+                    clientId,
+                    topicEvents,
+                    kafkaProducerProperties,
+                    factory
+            );
+        });
     }
 
     private void produceEvent(String eventAsString, String topic) throws InterruptedException, ExecutionException, TimeoutException {

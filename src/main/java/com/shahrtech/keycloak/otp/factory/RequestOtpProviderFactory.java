@@ -11,46 +11,46 @@ import com.shahrtech.keycloak.otp.kafka.KafkaStandardProducerFactory;
 import com.shahrtech.keycloak.otp.provider.RequestOtpProvider;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class RequestOtpProviderFactory implements RealmResourceProviderFactory {
     Logger logger = Logger.getLogger(RequestOtpProviderFactory.class);
-    private RealmResourceProvider instance;
-    private String bootstrapServers;
-    private String topicEvents;
-    private String clientId;
-    private Map<String, Object> kafkaProducerProperties;
+    private static final ConcurrentHashMap<String, RealmResourceProvider> instance = new ConcurrentHashMap<>();
+    private Scope scope;
 
     public static final String ID = "otpsms";
-    
+
     @Override
     public RealmResourceProvider create(KeycloakSession session) {
-        if (instance == null) {
-            instance = new RequestOtpProvider(session, bootstrapServers, clientId, topicEvents, kafkaProducerProperties, new KafkaStandardProducerFactory());
-        }
+        String realm = session.getContext().getRealm().getName();
+        return instance.computeIfAbsent(realm, r -> {
+            logger.info("Init kafka module ...");
+            String realmName = realm.toUpperCase();
+            String topicEvents = scope.get("topicEvents", System.getenv(realmName + "_KAFKA_TOPIC"));
+            String clientId = scope.get("clientId", System.getenv(realmName + "_KAFKA_CLIENT_ID"));
+            String bootstrapServers = scope.get("bootstrapServers", System.getenv(realmName + "_KAFKA_BOOTSTRAP_SERVERS"));
 
-        return instance;
+            if (topicEvents == null) {
+                throw new NullPointerException("topic must not be null.");
+            }
+
+            if (clientId == null) {
+                throw new NullPointerException("clientId must not be null.");
+            }
+
+            if (bootstrapServers == null) {
+                throw new NullPointerException("bootstrapServers must not be null");
+            }
+
+            Map<String, Object> kafkaProducerProperties = KafkaProducerConfig.init(scope);
+
+            return new RequestOtpProvider(session, bootstrapServers, clientId, topicEvents, kafkaProducerProperties, new KafkaStandardProducerFactory());
+        });
     }
 
     @Override
     public void init(Scope config) {
-        logger.info("Init kafka module ...");
-        topicEvents = config.get("topicEvents", System.getenv("KAFKA_TOPIC"));
-        clientId = config.get("clientId", System.getenv("KAFKA_CLIENT_ID"));
-        bootstrapServers = config.get("bootstrapServers", System.getenv("KAFKA_BOOTSTRAP_SERVERS"));
-
-        if (topicEvents == null) {
-            throw new NullPointerException("topic must not be null.");
-        }
-
-        if (clientId == null) {
-            throw new NullPointerException("clientId must not be null.");
-        }
-
-        if (bootstrapServers == null) {
-            throw new NullPointerException("bootstrapServers must not be null");
-        }
-
-        kafkaProducerProperties = KafkaProducerConfig.init(config);
+        scope = config;
     }
 
     @Override
